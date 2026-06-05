@@ -8,23 +8,29 @@ import { ChevronLeft, ChevronRight, FileSpreadsheet, Pencil, Save, X } from 'luc
 import * as XLSX from 'xlsx'
 import { toast } from '@/hooks/useToast'
 import { adminSupabase, supabase } from '@/lib/supabase'
-import type { Profile } from '@/types'
+import type { Profile, WorkCategory } from '@/types'
 
-type SheetCode = '' | 'P' | 'L'
+type SheetCode = '' | 'P' | 'L' | '1/2'
 
-const codeOptions: SheetCode[] = ['', 'P', 'L']
+const codeOptions: SheetCode[] = ['', 'P', 'L', '1/2']
 const DISPLAY_DAY_COUNT = 31
 
 function recordToCode(status: string): SheetCode {
-  if (status === 'Present' || status === 'Half Day') return 'P'
-  if (status === 'Absent' || status === 'Late') return 'L'
+  if (status === 'Present' || status === 'Late') return 'P'
+  if (status === 'Half Day') return '1/2'
+  if (status === 'Absent') return 'L'
   return ''
 }
 
 function codeToStatus(code: SheetCode) {
   if (code === 'P') return 'Present'
   if (code === 'L') return 'Absent'
+  if (code === '1/2') return 'Half Day'
   return 'Not Marked'
+}
+
+function formatTotal(value: number) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1)
 }
 
 function cellKey(userId: string, date: string) {
@@ -125,6 +131,10 @@ export default function AttendancePage() {
         attendance[dayNumber] = code
         if (code === 'P') totalPresent++
         if (code === 'L') totalLeave++
+        if (code === '1/2') {
+          totalPresent += 0.5
+          totalLeave += 0.5
+        }
       })
 
       return {
@@ -160,12 +170,14 @@ export default function AttendancePage() {
         const [userId, date] = key.split(':')
         const existing = latestRecordByCell.get(key)
         const status = codeToStatus(code)
+        const profileCategory = users?.find((user) => user.id === userId)?.category
+        const category = (existing?.category ?? profileCategory ?? 'Office') as WorkCategory
         const payload = {
           user_id: userId,
           date,
-          category: users?.find((user) => user.id === userId)?.category ?? 'Office',
+          category,
           status,
-          check_in_time: code === 'P' ? existing?.check_in_time ?? new Date(`${date}T09:30:00`).toISOString() : null,
+          check_in_time: code === 'P' || code === '1/2' ? existing?.check_in_time ?? new Date(`${date}T09:30:00`).toISOString() : null,
           late_minutes: 0,
         }
 
@@ -198,8 +210,8 @@ export default function AttendancePage() {
         row.employeeId || '-',
         row.name,
         ...dayLabels.map((day) => row.attendance[day] || ''),
-        row.totalPresent,
-        row.totalLeave,
+        formatTotal(row.totalPresent),
+        formatTotal(row.totalLeave),
       ]),
     ]
   }
@@ -289,7 +301,7 @@ export default function AttendancePage() {
                     Svastha Attendance {format(currentMonth, 'MMMM yyyy')}
                   </th>
                   <th className="border border-slate-700 bg-white px-2 py-1 text-center font-bold">P</th>
-                  <th className="border border-slate-700 bg-white px-2 py-1 text-center font-bold">L</th>
+                  <th className="border border-slate-700 bg-white px-2 py-1 text-center font-bold">L / 1/2</th>
                 </tr>
                 <tr className="bg-[#8faadc]">
                   <th className="border border-slate-700 px-1 py-1 align-bottom min-w-[38px]">S.NO</th>
@@ -337,17 +349,18 @@ export default function AttendancePage() {
                         const code = row.attendance[dayNumber]
                         const isOffDay = isValidMonthDay && isHighlightedOffDay(day)
                         const isLeave = code === 'L'
+                        const isHalfDay = code === '1/2'
 
                         return (
                           <td
                             key={dayNumber}
-                            className={`border border-slate-700 p-0 text-center min-w-[32px] h-6 ${isOffDay ? 'bg-[#f4decd]' : ''} ${isLeave ? 'bg-[#ffc7d1]' : ''}`}
+                            className={`border border-slate-700 p-0 text-center min-w-[32px] h-6 ${isOffDay ? 'bg-[#f4decd]' : ''} ${isLeave ? 'bg-[#ffc7d1]' : ''} ${isHalfDay ? 'bg-[#fff2b8]' : ''}`}
                           >
                             {isEditing && date ? (
                               <button
                                 type="button"
                                 className="h-6 w-full text-xs font-semibold hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                title="Click to change: blank, P, L"
+                                title="Click to change: blank, P, L, 1/2"
                                 onClick={() => cycleCellCode(row.id, date)}
                               >
                                 {code}
@@ -358,8 +371,8 @@ export default function AttendancePage() {
                           </td>
                         )
                       })}
-                      <td className="border border-slate-700 px-2 py-1 text-center font-bold">{row.totalPresent}</td>
-                      <td className="border border-slate-700 px-2 py-1 text-center font-bold">{row.totalLeave}</td>
+                      <td className="border border-slate-700 px-2 py-1 text-center font-bold">{formatTotal(row.totalPresent)}</td>
+                      <td className="border border-slate-700 px-2 py-1 text-center font-bold">{formatTotal(row.totalLeave)}</td>
                     </tr>
                   ))
                 )}

@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import { BriefcaseBusiness, Building2, Factory, MapPinned, RefreshCw, Users } from 'lucide-react'
-import { useAttendanceByDate } from '@/hooks/useAttendance'
+import { useAttendanceByDate, useUpdateAttendance } from '@/hooks/useAttendance'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -52,6 +53,7 @@ function latestByUser(records: Attendance[]) {
 export default function CategoryHistoryPage() {
   const [selectedDate, setSelectedDate] = useState(formatLocalDate(new Date()))
   const { data: records, isLoading, refetch, isFetching } = useAttendanceByDate(selectedDate)
+  const updateAttendance = useUpdateAttendance()
 
   const grouped = useMemo(() => {
     const latestRecords = latestByUser((records ?? []).filter((record) => Boolean(record.check_in_time)))
@@ -159,19 +161,20 @@ export default function CategoryHistoryPage() {
                       <TableHead className="w-[88px] whitespace-nowrap px-5">E Code</TableHead>
                       <TableHead className="px-4">Name</TableHead>
                       <TableHead className="w-[96px] whitespace-nowrap px-4">Check In</TableHead>
+                      <TableHead className="w-[116px] whitespace-nowrap px-4">Category</TableHead>
                       <TableHead className="w-[104px] whitespace-nowrap px-4 text-right">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {isLoading ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                        <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
                           Loading...
                         </TableCell>
                       </TableRow>
                     ) : items.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                        <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
                           No check-ins
                         </TableCell>
                       </TableRow>
@@ -190,6 +193,28 @@ export default function CategoryHistoryPage() {
                           </TableCell>
                           <TableCell className="whitespace-nowrap px-4 font-medium tabular-nums">
                             {formatTime(record.check_in_time)}
+                          </TableCell>
+                          <TableCell className="px-4">
+                            <Select
+                              value={record.category}
+                              disabled={updateAttendance.isPending}
+                              onValueChange={(value) => {
+                                const nextCategory = value as WorkCategory
+                                if (nextCategory === record.category) return
+                                updateAttendance.mutate({ id: record.id, category: nextCategory })
+                              }}
+                            >
+                              <SelectTrigger className="h-8 w-[96px] bg-background px-2 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {categories.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell className="px-4 text-right">
                             <Badge
