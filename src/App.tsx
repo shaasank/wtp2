@@ -8,6 +8,7 @@ import AttendancePage from '@/pages/AttendancePage'
 import AttendancePoliciesPage from '@/pages/AttendancePoliciesPage'
 import CategoryHistoryPage from '@/pages/CategoryHistoryPage'
 import LeavePage from '@/pages/LeavePage'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -29,25 +30,28 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="users" element={<UsersPage />} />
-        <Route path="attendance" element={<AttendancePage />} />
-        <Route path="attendance/policies" element={<AttendancePoliciesPage />} />
-        <Route path="categories" element={<CategoryHistoryPage />} />
-        <Route path="leaves" element={<LeavePage />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="attendance" element={<AttendancePage />} />
+          <Route path="attendance/policies" element={<AttendancePoliciesPage />} />
+          <Route path="categories" element={<CategoryHistoryPage />} />
+          <Route path="leaves" element={<LeavePage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+      <SpeedInsights />
+    </>
   )
 }
