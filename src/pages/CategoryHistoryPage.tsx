@@ -7,14 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { formatLocalDate } from '@/lib/date'
 import type { Attendance, WorkCategory } from '@/types'
 
@@ -155,46 +147,37 @@ export default function CategoryHistoryPage() {
                 <Badge variant={category.badge}>{items.length} users</Badge>
               </CardHeader>
               <CardContent className="p-0">
-                <Table className="table-fixed">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[88px] whitespace-nowrap px-5">E Code</TableHead>
-                      <TableHead className="px-4">Name</TableHead>
-                      <TableHead className="w-[96px] whitespace-nowrap px-4">Check In</TableHead>
-                      <TableHead className="w-[116px] whitespace-nowrap px-4">Category</TableHead>
-                      <TableHead className="w-[104px] whitespace-nowrap px-4 text-right">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <div className="overflow-x-auto">
+                  <div className="min-w-[590px]">
+                    <div className="grid grid-cols-[92px_minmax(130px,1fr)_94px_116px_96px] border-b border-border/50 px-5 py-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                      <div className="whitespace-nowrap">E Code</div>
+                      <div className="min-w-0 whitespace-nowrap">Name</div>
+                      <div className="whitespace-nowrap">Check In</div>
+                      <div className="whitespace-nowrap">Category</div>
+                      <div className="whitespace-nowrap text-right">Status</div>
+                    </div>
                     {isLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
-                          Loading...
-                        </TableCell>
-                      </TableRow>
+                      <div className="py-8 text-center text-sm text-muted-foreground">Loading...</div>
                     ) : items.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
-                          No check-ins
-                        </TableCell>
-                      </TableRow>
+                      <div className="py-8 text-center text-sm text-muted-foreground">No check-ins</div>
                     ) : (
                       items.map((record) => (
-                        <TableRow key={record.id}>
-                          <TableCell className="whitespace-nowrap px-5 font-semibold tabular-nums">
+                        <div
+                          key={record.id}
+                          className="grid grid-cols-[92px_minmax(130px,1fr)_94px_116px_96px] items-center border-b border-border/50 px-5 py-3 text-sm last:border-b-0"
+                        >
+                          <div className="whitespace-nowrap font-semibold tabular-nums">
                             {record.profiles?.employee_id ?? '-'}
-                          </TableCell>
-                          <TableCell className="min-w-0 px-4">
-                            <div className="min-w-0">
-                              <p className="truncate font-medium">
-                                {record.profiles?.full_name ?? 'Unknown employee'}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap px-4 font-medium tabular-nums">
+                          </div>
+                          <div className="min-w-0 pr-3">
+                            <p className="truncate font-medium">
+                              {record.profiles?.full_name ?? 'Unknown employee'}
+                            </p>
+                          </div>
+                          <div className="whitespace-nowrap font-medium tabular-nums">
                             {formatTime(record.check_in_time)}
-                          </TableCell>
-                          <TableCell className="px-4">
+                          </div>
+                          <div>
                             <Select
                               value={record.category}
                               disabled={updateAttendance.isPending}
@@ -204,7 +187,7 @@ export default function CategoryHistoryPage() {
                                 updateAttendance.mutate({ id: record.id, category: nextCategory })
                               }}
                             >
-                              <SelectTrigger className="h-8 w-[96px] bg-background px-2 text-xs">
+                              <SelectTrigger className="h-8 w-[100px] bg-background px-2 text-xs">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -215,8 +198,8 @@ export default function CategoryHistoryPage() {
                                 ))}
                               </SelectContent>
                             </Select>
-                          </TableCell>
-                          <TableCell className="px-4 text-right">
+                          </div>
+                          <div className="text-right">
                             <Badge
                               variant={
                                 record.status === 'Present'
@@ -228,12 +211,12 @@ export default function CategoryHistoryPage() {
                             >
                               {record.status}
                             </Badge>
-                          </TableCell>
-                        </TableRow>
+                          </div>
+                        </div>
                       ))
                     )}
-                  </TableBody>
-                </Table>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )
