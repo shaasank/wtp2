@@ -29,6 +29,7 @@ export default function LeavePage() {
 
       <Card>
         <CardContent className="p-0">
+          <div className="responsive-table-wrap">
           <Table>
             <TableHeader>
               <TableRow>
@@ -110,6 +111,7 @@ export default function LeavePage() {
               )}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

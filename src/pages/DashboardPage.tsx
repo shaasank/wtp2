@@ -61,9 +61,9 @@ export default function DashboardPage() {
       {/* Today's Attendance */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between gap-4">
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle className="text-sm font-semibold">Today's Attendance Status</CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {isEditingStatus ? (
                 <>
                   <Button variant="outline" size="sm" onClick={() => setIsEditingStatus(false)} disabled={isSavingStatuses}>

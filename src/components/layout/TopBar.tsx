@@ -1,7 +1,8 @@
-import { Bell, RefreshCw } from 'lucide-react'
+import { Bell, Menu, PanelLeftClose, PanelLeftOpen, RefreshCw } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
+import { useSidebar } from '@/contexts/SidebarContext'
 import { format } from 'date-fns'
 
 const routeTitles: Record<string, { title: string; subtitle: string }> = {
@@ -16,18 +17,43 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
 export default function TopBar() {
   const location = useLocation()
   const qc = useQueryClient()
+  const { collapsed, toggleCollapsed, toggleMobile } = useSidebar()
   const meta = routeTitles[location.pathname] ?? { title: 'WorkTrackPro', subtitle: '' }
   const now = format(new Date(), 'EEEE, dd MMMM yyyy')
 
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between gap-4 px-6 flex-shrink-0">
-      <div className="min-w-0 text-left">
-        <h1 className="text-base font-semibold text-foreground">{meta.title}</h1>
-        <p className="text-xs text-muted-foreground truncate">{meta.subtitle}</p>
+    <header className="flex h-14 flex-shrink-0 items-center justify-between gap-3 border-b border-border bg-card/50 px-4 backdrop-blur-sm sm:h-16 sm:gap-4 sm:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="flex-shrink-0 lg:hidden"
+          onClick={toggleMobile}
+          title="Open navigation"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hidden flex-shrink-0 lg:inline-flex"
+          onClick={toggleCollapsed}
+          title={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+          aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+        >
+          {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+        </Button>
+
+        <div className="min-w-0 text-left">
+          <h1 className="truncate text-sm font-semibold text-foreground sm:text-base">{meta.title}</h1>
+          <p className="truncate text-xs text-muted-foreground">{meta.subtitle}</p>
+        </div>
       </div>
 
-      <div className="flex flex-shrink-0 items-center gap-3">
-        <span className="text-xs text-muted-foreground hidden md:block">{now}</span>
+      <div className="flex flex-shrink-0 items-center gap-1 sm:gap-3">
+        <span className="hidden text-xs text-muted-foreground xl:inline">{now}</span>
 
         <Button
           variant="ghost"
@@ -36,14 +62,14 @@ export default function TopBar() {
           title="Refresh data"
           id="refresh-data-btn"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="h-4 w-4" />
         </Button>
 
         <Button variant="ghost" size="icon" id="notifications-btn">
-          <Bell className="w-4 h-4" />
+          <Bell className="h-4 w-4" />
         </Button>
 
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-white">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-xs font-bold text-white">
           A
         </div>
       </div>

@@ -145,6 +145,7 @@ export default function UsersPage() {
 
       <Card>
         <CardContent className="p-0">
+          <div className="responsive-table-wrap">
           <Table>
             <TableHeader>
               <TableRow>
@@ -211,6 +212,7 @@ export default function UsersPage() {
               )}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
@@ -274,7 +276,7 @@ export default function UsersPage() {
             <DialogTitle>Edit Employee</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Full Name</Label>
                 <Input required value={editFullName} onChange={e => setEditFullName(e.target.value)} />
@@ -284,7 +286,7 @@ export default function UsersPage() {
                 <Input required value={editEmployeeId} onChange={e => setEditEmployeeId(e.target.value)} />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4 border-t pt-4 mt-2">
+            <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label>Casual Leave</Label>
                 <Input type="number" required value={editCL} onChange={e => setEditCL(e.target.value)} />

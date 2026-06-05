@@ -48,7 +48,7 @@ export default function AttendancePoliciesPage() {
           <CardDescription>Configure check-in cutoff and auto-logout times.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="cutoff">Late Arrival Cutoff Time</Label>
               <Input

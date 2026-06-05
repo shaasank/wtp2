@@ -2,22 +2,23 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import TopBar from './TopBar'
 import { Toaster } from '@/components/ui/toaster'
+import { SidebarProvider } from '@/contexts/SidebarContext'
 
 export default function AppLayout() {
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar />
+    <SidebarProvider>
+      <div className="flex h-screen overflow-hidden bg-background">
+        <Sidebar />
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <TopBar />
-        <main className="flex-1 overflow-y-auto p-6 text-left">
-          <Outlet />
-        </main>
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <TopBar />
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 text-left sm:p-6">
+            <Outlet />
+          </main>
+        </div>
+
+        <Toaster />
       </div>
-
-      <Toaster />
-    </div>
+    </SidebarProvider>
   )
 }
